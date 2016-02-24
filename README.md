@@ -2,6 +2,12 @@
 
 [CoreOS Clair](https://github.com/coreos/clair/) is a vulnerability analysis service.
 
+This lab goals:
+
+- Use [CentOS 7.x Vagrant Box](https://atlas.hashicorp.com/centos/boxes/7)
+- Use [Docker Official Engine](https://docs.docker.com/engine/installation/linux/centos/)
+- Use Go through the [`golang` container](https://hub.docker.com/_/golang/)
+
 ## Vagrant
 
 This is a CentOS 7 lab, so go for it, with Virtualbox:
@@ -18,16 +24,17 @@ Add the _vagrant_ user to the _docker_ group:
 
     $ sudo usermod -aG docker vagrant
 
-Logout/Login
-
-    $ exit
-
 Enable and activate Docker service:
 
     $ sudo systemctl enable docker
     $ sudo systemctl start docker
 
-Is the version OK ?
+Logout/Login
+
+    $ exit
+    $ vagrant ssh
+
+Is the Docker version OK ?
 
     $ docker --version
     Docker version 1.10.2, build c3959b1
@@ -44,7 +51,9 @@ Change the SELinux context for the configuration inside the Vagrant shared folde
 
 Finally run and expose ports 6060 (API) and 6061 (public health checks), with the shared configuration:
 
-    $ sudo docker run -p 6060:6060 -p 6061:6061 -v `pwd`/sync/config:/config:ro quay.io/coreos/clair:latest --config=/config/config.memstore.yaml
+    $ sudo docker run -p 6060:6060 -p 6061:6061 \
+    -v `pwd`/sync/config:/config:ro quay.io/coreos/clair:latest \
+    --config=/config/config.memstore.yaml
 
 Wait for ~15mn for the CVEs to download and DB to populate.
 
@@ -68,15 +77,23 @@ Get information about a vulnerability:
 
 ## Local Analysis
 
+Let's try to use [this simple tool](https://github.com/coreos/clair/contrib/analyze-local-images) built by CoreOS folks, using the _golang_ container to generate the binary:
+
     $ mkdir ~/go
     $ chcon -Rt svirt_sandbox_file_t go
     $ sudo docker run -it -v `pwd`/go:/go golang go get -u github.com/coreos/clair/contrib/analyze-local-images
+
+You may want to update your `PATH`:
+
     $ PATH=$PATH:~/go/bin/
 
 Grab a known vulnerable image:
 
     $ sudo docker pull ubuntu:precise-20151020
-    $ analyze-local-images -endpoint "http://192.168.99.100:6060" -my-address "192.168.99.1" b1e4aeb0480d
+
+Analyze it:
+
+    $ analyze-local-images ubuntu:precise-20151020
 
 ## Sources
 
