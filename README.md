@@ -14,26 +14,7 @@ This is a CentOS 7 lab, so go for it, with Virtualbox:
 
     $ vagrant up --provider=virtualbox
 
-## Install Docker
-
-Automatically install Docker from official repositories:
-
-    $ curl -fsSL https://get.docker.com/ | sh
-
-Optionally add the _vagrant_ user to the _docker_ group:
-
-    $ sudo usermod -aG docker vagrant
-    # remember to logout and re-login to activate changes
-
-Enable and activate Docker service:
-
-    $ sudo systemctl enable docker
-    $ sudo systemctl start docker
-
-Is the Docker version OK ?
-
-    $ docker --version
-    Docker version 1.10.2, build c3959b1
+It will automatically provision with latest Docker from official repos.
 
 ## Launch Clair
 
