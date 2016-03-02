@@ -14,17 +14,13 @@ This is a CentOS 7 lab, so go for it, with Virtualbox:
 
     $ vagrant up --provider=virtualbox
 
-It will automatically provision with latest Docker from official repos.
+The Vagrantfile will automatically
 
-## Launch Clair
+- provision with latest Docker from official repos.
+- pull Clair from Quay
+- change the SELinux context for the configuration inside the Vagrant shared folder
 
-Pull the Clair image:
-
-    $ sudo docker pull quay.io/coreos/clair:latest
-
-Change the SELinux context for the configuration inside the Vagrant shared folder:
-
-    $ chcon -Rt svirt_sandbox_file_t ~/sync/config
+## Run Clair
 
 Finally run and expose ports 6060 (API) and 6061 (public health checks), with the shared configuration:
 
